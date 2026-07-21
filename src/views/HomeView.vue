@@ -1,6 +1,7 @@
 <script setup lang="ts">
 // În Sesiunea 03 ne concentrăm pe structura statică (UI Architecture) și CSS Grid.
 // Nu folosim încă directive Vue precum v-for sau reactive state. Ele vor fi predate în Sesiunea 04.
+import MovieListItem from "../components/MovieListItem.vue";
 </script>
 
 <template>
@@ -16,13 +17,18 @@
 
     <!-- Grid static responsive (CSS Grid) -->
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
-      
+      <movie-list-item title="asdasdasd">
+        <slot><p>1111</p></slot>
+        <template v-slot:extraInfo>
+          <p>22222</p>
+        </template>
+      </movie-list-item>
       <!-- Film 1: Interstellar -->
       <article class="group bg-zinc-900/60 rounded-xl overflow-hidden border border-zinc-800 hover:border-red-500/50 hover:shadow-[0_12px_24px_rgba(220,38,38,0.15)] hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between">
         <div class="relative aspect-3/4 overflow-hidden bg-zinc-950">
-          <img 
-            src="https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=400&auto=format&fit=crop" 
-            alt="Interstellar" 
+          <img
+            src="https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=400&auto=format&fit=crop"
+            alt="Interstellar"
             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             loading="lazy"
           />

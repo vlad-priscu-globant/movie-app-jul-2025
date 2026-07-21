@@ -3,6 +3,8 @@ import type { UserCredentials } from '../types';
 
 // În această sesiune ne concentrăm pe arhitectura statică și stilizare
 const handleLogin = (e: Event) => {
+  // exempla of getting a value form a form
+  // console.log(e.target[0].value)
   e.preventDefault();
   
   // Demonstrăm utilizarea tipului UserCredentials în TypeScript
@@ -11,7 +13,6 @@ const handleLogin = (e: Event) => {
     password: "password123"
   };
   
-  alert(`Autentificare simulată pentru: ${credentials.email}`);
 };
 </script>
 
