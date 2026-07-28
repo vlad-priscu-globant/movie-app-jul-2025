@@ -1,0 +1,51 @@
+# Cursor AI Workspace Rules & Context Directives
+
+# ======================================================================
+# 1. MASTER CONTEXT POINTERS
+# ======================================================================
+# Direct Cursor AI to primary architectural documentation:
+# Primary Blueprint:   @ARCHITECTURE.md
+# Project Directives:  @project-preferences.md
+# Discovery Findings:  @DISCOVERY_REPORT.md
+# Agent Operational Rules: @.agents/rules/persona-and-principles.md
+
+# ======================================================================
+# 2. IGNORED DIRECTORIES & PATH EXCLUSIONS
+# ======================================================================
+# Exclude build outputs, dependencies, and generated caches from indexing context:
+ignore_directories:
+  - .nuxt/
+  - .output/
+  - node_modules/
+  - dist/
+  - .idea/
+  - .git/
+
+# ======================================================================
+# 3. STRICT ARCHITECTURAL GUARDRAILS
+# ======================================================================
+# Rule 1: Use <script setup lang="ts"> exclusively in all Vue SFCs.
+# Rule 2: Zero `any` types permitted. Strict type safety across function parameters, props, and API contracts.
+# Rule 3: No direct DOM manipulation (document.getElementById, querySelector, innerHTML). Use ref / reactive.
+# Rule 4: Component state isolation — Props Down (read-only), Emits Up (defineEmits).
+
+# ======================================================================
+# 4. NUXT 3 & SUPABASE CONVENTIONS
+# ======================================================================
+# Nuxt Directory Layout:
+# - pages/       -> Route views
+# - layouts/     -> App layout shells
+# - components/  -> Auto-imported Vue components
+# - composables/ -> Reusable reactive state hooks (useMovieCatalog.ts, useAuth.ts)
+# - server/api/  -> Express / Node server endpoint handlers
+#
+# Supabase Integration:
+# - Access client via useSupabaseClient()
+# - Guard authenticated routes using useSupabaseUser() in Nuxt middleware
+# - Type all database entity responses using TypeScript interfaces
+
+# ======================================================================
+# 5. CONTEXT SYNCHRONIZATION & SKILL ACCESS
+# ======================================================================
+# To access newly generated skills (.agents/skills/), project preferences, or cross-tool changes:
+# Always check `git diff` and `git status` when auditing modified workspace state.
