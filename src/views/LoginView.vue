@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { ref, reactive, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { z } from 'zod'
+import { loginUser } from '../api/localDb'
+
+const router = useRouter()
 
 // 1. Definim schema Zod
 const loginSchema = z.object({
@@ -12,45 +16,52 @@ const loginSchema = z.object({
 type LoginForm = z.infer<typeof loginSchema>
 
 // 2. State formular
-// Folosim ref pentru a demonstra lucrul cu ref-uri pe obiecte (necesită .value în JS)
 const form = ref<LoginForm>({
   email: '',
   password: ''
 })
 
-// Folosim reactive pentru a demonstra starea grupată fără .value
 const errors = reactive<Record<keyof LoginForm, string>>({
   email: '',
   password: ''
 })
 
+const apiError = ref('')
+
 // 3. Watchers: Curățăm erorile când utilizatorul reîncepe să scrie
-// Monitorizăm proprietățile din interiorul ref-ului folosind funcții getter (.value.prop)
 watch(() => form.value.email, () => {
   if (errors.email) errors.email = ''
+  if (apiError.value) apiError.value = ''
 })
 watch(() => form.value.password, () => {
   if (errors.password) errors.password = ''
+  if (apiError.value) apiError.value = ''
 })
 
-// 4. Computed: Verificăm silențios dacă formularul este valid (pentru a debloca butonul)
-// const isFormValid = computed(() => {
-//   return loginSchema.safeParse(form.value).success
-// })
+const isSubmitting = ref(false)
 
-// 5. Validare finală la Submit
-const handleLogin = () => {
+// 4. Validare finală & Trimitere la Submit
+const handleLogin = async () => {
   const result = loginSchema.safeParse(form.value)
   
   if (!result.success) {
-    // Extragem erorile din Zod și le punem în starea de erori
     const formattedErrors = result.error.format()
     errors.email = formattedErrors.email?._errors[0] || ''
     errors.password = formattedErrors.password?._errors[0] || ''
     return
   }
 
-  console.log('Formular valid! Date trimise către API:', result.data)
+  isSubmitting.value = true
+  try {
+    apiError.value = ''
+    const username = form.value.email.split('@')[0] || 'student'
+    await loginUser(username, form.value.password)
+    router.push('/')
+  } catch (err: unknown) {
+    apiError.value = err instanceof Error ? err.message : 'Eroare la conectarea la server'
+  } finally {
+    isSubmitting.value = false
+  }
 }
 </script>
 
@@ -58,13 +69,17 @@ const handleLogin = () => {
   <div class="max-w-md mx-auto mt-10 bg-gray-900 p-8 rounded-xl shadow-2xl border border-gray-800">
     <h2 class="text-2xl font-bold mb-6 text-center text-white">Autentificare</h2>
     
+    <p v-if="apiError" class="mb-4 text-center text-sm font-medium text-red-500 bg-red-950/50 p-2 rounded-lg border border-red-800">
+      {{ apiError }}
+    </p>
+
     <form @submit.prevent="handleLogin" class="flex flex-col gap-5">
       <div>
         <label class="block text-sm font-medium text-gray-400 mb-1">Email</label>
         <input 
           v-model="form.email"
           type="text" 
-          placeholder="exemplu@adresa.ro"
+          placeholder="student@adresa.ro"
           class="w-full bg-gray-950 text-white placeholder-gray-600 px-4 py-2 rounded-lg border focus:outline-hidden transition-colors"
           :class="errors.email ? 'border-red-500 focus:border-red-500' : 'border-gray-700 focus:border-red-600'"
         />
@@ -85,9 +100,16 @@ const handleLogin = () => {
 
       <button
         type="submit" 
-        class="mt-4 text-white font-semibold py-2.5 rounded-lg transition-all bg-red-600 hover:bg-red-700 active:scale-95"
+        :disabled="isSubmitting"
+        class="mt-4 text-white font-semibold py-2.5 rounded-lg transition-all bg-red-600 hover:bg-red-700 active:scale-95 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        Intră în cont
+        <template v-if="isSubmitting">
+          <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+          <span>Se autentifică...</span>
+        </template>
+        <template v-else>
+          <span>Intră în cont</span>
+        </template>
       </button>
     </form>
   </div>

@@ -3,21 +3,14 @@ import type { Movie } from '../types'
 
 const props = defineProps<{
   movie: Movie
-  isFavorite?: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'selectMovie', movie: Movie): void
-  (e: 'toggleFavorite', movieId: number): void
 }>()
 
 const handleCardClick = () => {
   emit('selectMovie', props.movie)
-}
-
-const handleFavoriteClick = (event: Event) => {
-  event.stopPropagation()
-  emit('toggleFavorite', props.movie.id)
 }
 </script>
 
@@ -33,17 +26,6 @@ const handleFavoriteClick = (event: Event) => {
         :alt="movie.title" 
         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
       />
-      
-      <!-- Favorite Button Overlay -->
-      <button 
-        @click="handleFavoriteClick"
-        type="button"
-        class="absolute top-2 right-2 p-2 rounded-full bg-gray-900/80 hover:bg-red-600 text-white transition-colors"
-        :title="isFavorite ? 'Șterge din favorite' : 'Adaugă la favorite'"
-      >
-        <span v-if="isFavorite" class="text-red-500 hover:text-white font-bold text-sm">★</span>
-        <span v-else class="text-gray-300 font-bold text-sm">☆</span>
-      </button>
     </div>
 
     <!-- Content -->
