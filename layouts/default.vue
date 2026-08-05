@@ -2,8 +2,8 @@
 const router = useRouter()
 const { isAuthenticated, username, logout } = useAuth()
 
-const handleLogout = () => {
-  logout()
+const handleLogout = async () => {
+  await logout()
   router.push('/')
 }
 </script>

@@ -10,6 +10,14 @@ export default defineNuxtConfig({
       tailwindcss()
     ]
   },
+  modules: ['@nuxtjs/supabase'],
+  supabase: {
+    redirectOptions: {
+      login: '/login',
+      callback: '/confirm',
+      exclude: ['/', '/login', '/register', '/movie/*'],
+    }
+  },
   runtimeConfig: {
     tmdbApiKey: process.env.VITE_API_URL || process.env.VITE_TMDB_API_KEY || '',
     tmdbBaseUrl: process.env.VITE_BASE_URL || 'https://api.themoviedb.org/3',

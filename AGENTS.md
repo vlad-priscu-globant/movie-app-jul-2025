@@ -36,6 +36,10 @@ Every AI interaction and code edit MUST comply with the following 4 rules:
   Direct DOM manipulation (`document.getElementById`, `querySelector`, `innerHTML`) is banned. Use Vue `ref`, `reactive`, and `computed`.
 * **Rule 4: Component State Isolation**  
   State flow follows **Props Down (read-only), Emits Up (`defineEmits`)**. Direct mutation of props in child components is prohibited.
+* **Rule 5: Autonomous Database Migrations**  
+  The AI is fully responsible for executing Supabase database migrations (via CLI or MCP) and ensuring all schema changes and RLS policies are actively pushed and verified against the live environment.
+* **Rule 6: Strict User ID Validation**  
+  When fetching or mutating data in Supabase that requires authentication, ALWAYS strictly verify the user ID exists (e.g., `if (!user.value?.id) return`) to prevent the Supabase client from sending a literal `"undefined"` string and triggering a 400 invalid UUID error during Nuxt SSR hydration.
 
 ---
 
@@ -49,18 +53,20 @@ Every AI interaction and code edit MUST comply with the following 4 rules:
 
 ## 4. CLI Verification Commands
 
+> **IMPORTANT OS RESTRICTION:** On this system, PowerShell execution for `npm` is blocked. ALWAYS execute CLI tools and npm scripts using `cmd.exe /c` (e.g., `cmd.exe /c npm run dev`). Do NOT run `npm` commands directly.
+
 ```bash
 # Development server launch
-npm run dev
+cmd.exe /c npm run dev
 
 # Production build & typecheck
-npm run build
+cmd.exe /c npm run build
 
 # Direct typecheck verification
-npm run typecheck   # (npx vue-tsc --noEmit)
+cmd.exe /c npm run typecheck   # (npx vue-tsc --noEmit)
 
 # Linting & code formatting verification
-npm run lint        # (npx eslint .)
+cmd.exe /c npm run lint        # (npx eslint .)
 ```
 
 ---
