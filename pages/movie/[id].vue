@@ -12,6 +12,14 @@ const { data: movie, pending, error } = await useFetch<MovieDetail>(`/api/movies
 const { isFavorite, toggleFavorite } = useFavorites()
 const user = useSupabaseUser()
 
+useSeoMeta({
+  title: () => movie.value ? `${movie.value.title} - Premium Movie DB` : 'Premium Movie DB',
+  ogTitle: () => movie.value?.title,
+  ogDescription: () => movie.value?.overview,
+  ogImage: () => movie.value?.image || 'https://via.placeholder.com/500x750?text=No+Image',
+  ogType: 'movie'
+})
+
 const onToggleFavorite = () => {
   if (!user.value) {
     alert('Trebuie să fii autentificat pentru a adăuga la favorite.')
