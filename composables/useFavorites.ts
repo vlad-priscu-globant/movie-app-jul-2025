@@ -22,9 +22,8 @@ export const useFavorites = () => {
   // Track last user ID for which favorites were loaded from Supabase
   const lastLoadedUserId = useState<string | null>('lastLoadedUserId', () => null)
 
-  const isPending = (movieId: number | string): boolean => {
-    const idNum = Number(movieId)
-    return pendingIdsState.value.includes(idNum)
+  const isPending = (movieId: number): boolean => {
+    return pendingIdsState.value.includes(movieId)
   }
 
   const getUserId = (): string | null => {
@@ -129,12 +128,11 @@ export const useFavorites = () => {
     }
   }
 
-  const toggleFavorite = async (movieId: number | string) => {
-    const idNum = Number(movieId)
-    if (isNaN(idNum)) return
+  const toggleFavorite = async (movieId: number) => {
+    if (typeof movieId !== 'number' || isNaN(movieId)) return
 
     // Guard: Prevent duplicate in-flight requests for the same movie ID
-    if (pendingIdsState.value.includes(idNum)) {
+    if (pendingIdsState.value.includes(movieId)) {
       return
     }
 
@@ -147,35 +145,35 @@ export const useFavorites = () => {
     }
 
     // Set pending tracking
-    pendingIdsState.value = [...pendingIdsState.value, idNum]
+    pendingIdsState.value = [...pendingIdsState.value, movieId]
 
-    const isFav = favoriteIds.value.includes(idNum)
+    const isFav = favoriteIds.value.includes(movieId)
     const previousState = [...favoriteIds.value]
 
     try {
       if (isFav) {
-        const updated = favoriteIds.value.filter(id => id !== idNum)
+        const updated = favoriteIds.value.filter(id => id !== movieId)
         saveFavorites(updated)
         
         const { error } = await supabase
           .from('favorites')
           .delete()
           .eq('user_id', currentUserId)
-          .eq('movie_id', idNum)
+          .eq('movie_id', movieId)
 
         if (error) {
           console.warn('Eroare la ștergerea din Supabase:', error.message)
           saveFavorites(previousState)
         }
       } else {
-        if (!favoriteIds.value.includes(idNum)) {
-          const updated = [...favoriteIds.value, idNum]
+        if (!favoriteIds.value.includes(movieId)) {
+          const updated = [...favoriteIds.value, movieId]
           saveFavorites(updated)
         }
 
         const payload = {
           user_id: currentUserId,
-          movie_id: idNum
+          movie_id: movieId
         } as never
         
         const { error } = await supabase
@@ -192,13 +190,12 @@ export const useFavorites = () => {
       saveFavorites(previousState)
     } finally {
       // Clear pending tracking when promise resolves
-      pendingIdsState.value = pendingIdsState.value.filter(id => id !== idNum)
+      pendingIdsState.value = pendingIdsState.value.filter(id => id !== movieId)
     }
   }
 
-  const isFavorite = (movieId: number | string) => {
-    const idNum = Number(movieId)
-    return favoriteIds.value.includes(idNum)
+  const isFavorite = (movieId: number): boolean => {
+    return favoriteIds.value.includes(movieId)
   }
   
   // Watch user ID with immediate execution to sync auth state

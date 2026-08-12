@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const router = useRouter()
 const { isAuthenticated, username, logout } = useAuth()
+const { favoriteCount } = useFavorites()
 
 const handleLogout = async () => {
   await logout()
@@ -23,7 +24,8 @@ const handleLogout = async () => {
             class="flex items-center gap-1 text-xs sm:text-sm font-semibold text-gray-300 hover:text-red-500 transition-colors px-2 py-1"
           >
             <span class="text-red-500">★</span>
-            <span class="hidden sm:inline">Favorite</span>
+            <span class="hidden sm:inline">Favorites ({{ favoriteCount }})</span>
+            <span class="sm:hidden font-semibold">({{ favoriteCount }})</span>
           </NuxtLink>
 
           <!-- User Info Badge -->
