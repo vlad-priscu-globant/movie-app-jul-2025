@@ -39,13 +39,6 @@ export async function fetchPopularMovies(): Promise<Movie[]> {
   }))
 }
 
-export async function searchMovies(query: string): Promise<Movie[]> {
-  const data = await httpWrapper<{ movies: Movie[] }>(
-    `${BASE_URL}/api/movies/search?query=${encodeURIComponent(query)}`
-  )
-
-  return data.movies || []
-}
 export async function fetchMovieDetail(movieId: number): Promise<MovieDetail> {
   const data = await httpWrapper<TmdbRawMovie>(`${BASE_URL}/api/movies/${movieId}`)
   return {
