@@ -78,6 +78,8 @@ const handleSubmit = async () => {
         password: form.value.password,
       })
       if (error) throw error
+      const { loadFavorites } = useFavorites()
+      await loadFavorites(true)
       router.push('/')
     }
   } catch (err: any) {
