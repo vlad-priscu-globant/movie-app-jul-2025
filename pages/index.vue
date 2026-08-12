@@ -1,18 +1,24 @@
 <script setup lang="ts">
-import type { Movie } from '~/types'
+import type { Movie, PaginatedMoviesResponse } from '~/types'
 
 const router = useRouter()
 
 // Starea input-ului de căutare
 const searchQuery = ref('')
 
-// Preia filmele populare prin Nuxt SSR useFetch
-const { data, pending, error } = await useFetch<{ movies: Movie[] }>('/api/movies/popular', {
+// Pagina curentă pentru paginare
+const currentPage = ref(1)
+
+// Preia filmele populare prin Nuxt SSR useFetch – refetch automat la schimbarea paginii
+const { data, pending, error } = await useFetch<PaginatedMoviesResponse>('/api/movies/popular', {
   key: 'popular-movies',
-  default: () => ({ movies: [] })
+  query: { page: currentPage },
+  watch: [currentPage],
+  default: () => ({ movies: [], totalPages: 1, currentPage: 1 })
 })
 
 const movies = computed(() => data.value?.movies || [])
+const totalPages = computed(() => data.value?.totalPages ?? 1)
 
 // Stare derivată: returnează doar filmele care conțin textul din searchQuery
 const filteredMovies = computed(() => {
@@ -21,9 +27,20 @@ const filteredMovies = computed(() => {
   )
 })
 
+// Resetează la pagina 1 când utilizatorul modifică textul de căutare
+watch(searchQuery, () => {
+  currentPage.value = 1
+})
+
 // Navigation către pagina de detalii a filmului
 const handleSelectMovie = (movie: Movie) => {
   router.push(`/movie/${movie.id}`)
+}
+
+// Handler paginare – schimbă pagina și derulează sus
+const handlePageChange = (page: number) => {
+  currentPage.value = page
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 </script>
 
@@ -56,5 +73,13 @@ const handleSelectMovie = (movie: Movie) => {
         @select-movie="handleSelectMovie"
       />
     </div>
+
+    <!-- Controale de paginare -->
+    <PaginationControls
+      :current-page="currentPage"
+      :total-pages="totalPages"
+      @page-change="handlePageChange"
+    />
   </div>
 </template>
+
