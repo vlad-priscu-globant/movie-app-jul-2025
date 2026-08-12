@@ -1,6 +1,7 @@
 export function useAuth() {
   const user = useSupabaseUser()
   const supabase = useSupabaseClient()
+  const { clearFavorites } = useFavorites()
 
   const isAuthenticated = computed(() => !!user.value)
   
@@ -10,6 +11,7 @@ export function useAuth() {
   })
 
   const logout = async () => {
+    clearFavorites()
     await supabase.auth.signOut()
   }
 
