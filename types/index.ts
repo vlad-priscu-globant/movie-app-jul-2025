@@ -29,3 +29,9 @@ export interface FavoriteMovie {
 export interface AuthResponse {
   token: string
 }
+
+export interface PaginatedMoviesResponse {
+  movies: Movie[]
+  totalPages: number
+  currentPage: number
+}
