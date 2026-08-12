@@ -16,8 +16,8 @@ useSeoMeta({
   title: () => movie.value ? `${movie.value.title} - Premium Movie DB` : 'Premium Movie DB',
   ogTitle: () => movie.value?.title,
   ogDescription: () => movie.value?.overview,
-  ogImage: () => movie.value?.image,
-  ogType: 'video.movie'
+  ogImage: () => movie.value?.image || 'https://via.placeholder.com/500x750?text=No+Image',
+  ogType: 'movie'
 })
 
 const onToggleFavorite = () => {
