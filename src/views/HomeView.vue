@@ -1,82 +1,72 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
+
 import type { Movie } from '../types'
+
 import SearchBar from '../components/SearchBar.vue'
 import MovieCard from '../components/MovieCard.vue'
-import { fetchPopularMovies, searchMovies } from '../api/localDb'
+
+import {
+  fetchPopularMovies,
+  searchMovies
+} from '../api/localDb'
 
 const router = useRouter()
 
-// Lista de filme afișată în pagină
-const movies = ref<Movie[]>([
-  {
-    id: 1,
-    title: 'Inception',
-    year: 2010,
-    image: 'https://image.tmdb.org/t/p/w500/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg'
-  },
-  {
-    id: 2,
-    title: 'Interstellar',
-    year: 2014,
-    image: 'https://image.tmdb.org/t/p/w500/gEU2QlsUUHXjNpeMacBjQcs45u.jpg'
-  },
-  {
-    id: 3,
-    title: 'Dunkirk',
-    year: 2017,
-    image: 'https://image.tmdb.org/t/p/w500/ebSnODcju8UT016dzcqhU3N8ZcZ.jpg'
-  }
-])
+// Lista care este afișată în grid
+const movies = ref<Movie[]>([])
 
-// Ce scrie utilizatorul în SearchBar
+// Textul introdus în SearchBar
 const searchQuery = ref('')
 
-// Încarcă filmele populare
+// Încarcă lista normală de filme populare
 const loadData = async () => {
   try {
-    const popular = await fetchPopularMovies()
-
-    if (popular.length > 0) {
-      movies.value = popular
-    }
-  } catch (e) {
-    console.warn(
-      'Nu s-au putut prelua filmele din TMDB proxy, se folosesc cele locale:',
-      e
+    movies.value = await fetchPopularMovies()
+  } catch (error) {
+    console.error(
+      'Error loading popular movies:',
+      error
     )
   }
 }
 
+// La deschiderea paginii încărcăm filmele populare
 onMounted(() => {
   loadData()
 })
 
-// Debounce pentru search
+// Timer folosit pentru debounce
 let searchTimeout: ReturnType<typeof setTimeout>
 
+// Urmărim ce scrie utilizatorul în SearchBar
 watch(searchQuery, (newQuery) => {
   clearTimeout(searchTimeout)
 
   searchTimeout = setTimeout(async () => {
     const query = newQuery.trim()
 
-    // Dacă ștergem căutarea, afișăm iar filmele populare
+    // Dacă SearchBar-ul este gol,
+    // revenim la filmele populare
     if (!query) {
       await loadData()
       return
     }
 
     try {
+      // CALL către endpoint-ul nostru cu query-ul
       movies.value = await searchMovies(query)
-    } catch (e) {
-      console.error('Eroare la căutarea filmelor:', e)
+    } catch (error) {
+      console.error(
+        'Error searching movies:',
+        error
+      )
     }
   }, 300)
 })
 
-// Navigare către pagina filmului
+// Când utilizatorul apasă pe un film
 const handleSelectMovie = (movie: Movie) => {
   router.push(`/movie/${movie.id}`)
 }
